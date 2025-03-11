@@ -1,0 +1,163 @@
+object frmMain: TfrmMain
+  Left = 398
+  Height = 550
+  Top = 32
+  Width = 700
+  Caption = 'Test Read Firefox Cookies'
+  ClientHeight = 550
+  ClientWidth = 700
+  Constraints.MinHeight = 550
+  Constraints.MinWidth = 700
+  Menu = mmMain
+  Position = poScreenCenter
+  LCLVersion = '4.99.0.0'
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
+  object gbPath: TGroupBox
+    Left = 4
+    Height = 54
+    Top = 38
+    Width = 696
+    Align = alTop
+    AutoSize = True
+    BorderSpacing.Left = 4
+    BorderSpacing.Bottom = 4
+    Caption = 'Path to cookies'
+    ClientHeight = 35
+    ClientWidth = 694
+    TabOrder = 1
+    object edtPath: TEdit
+      Left = 4
+      Height = 35
+      Top = 0
+      Width = 650
+      Align = alTop
+      BorderSpacing.Left = 4
+      Constraints.MaxWidth = 650
+      ReadOnly = True
+      TabOrder = 0
+    end
+  end
+  object gbCookies: TGroupBox
+    Left = 4
+    Height = 454
+    Top = 96
+    Width = 696
+    Align = alClient
+    BorderSpacing.Left = 4
+    Caption = 'Cookies data'
+    ClientHeight = 435
+    ClientWidth = 694
+    TabOrder = 2
+    object DBGridCookies: TDBGrid
+      Left = 4
+      Height = 435
+      Top = 0
+      Width = 686
+      Align = alClient
+      BorderSpacing.Left = 4
+      BorderSpacing.Right = 4
+      Color = clWindow
+      Columns = <>
+      DataSource = dsCookies
+      ReadOnly = True
+      TabOrder = 0
+    end
+  end
+  object panButtons: TPanel
+    Left = 4
+    Height = 34
+    Top = 0
+    Width = 696
+    Align = alTop
+    AutoSize = True
+    BorderSpacing.Left = 4
+    BorderSpacing.Bottom = 4
+    BevelOuter = bvNone
+    ClientHeight = 34
+    ClientWidth = 696
+    TabOrder = 0
+    object btnCookiesFind: TButton
+      Left = 4
+      Height = 34
+      Top = 0
+      Width = 60
+      Action = actCookiesFind
+      Align = alLeft
+      AutoSize = True
+      BorderSpacing.Left = 4
+      Constraints.MinWidth = 60
+      TabOrder = 0
+    end
+    object btnCookiesRead: TButton
+      Left = 68
+      Height = 34
+      Top = 0
+      Width = 60
+      Action = actCookiesRead
+      Align = alLeft
+      AutoSize = True
+      BorderSpacing.Left = 4
+      Constraints.MinWidth = 60
+      TabOrder = 1
+    end
+  end
+  object mmMain: TMainMenu
+    Left = 425
+    Top = 216
+    object mnuFile: TMenuItem
+      Caption = '&File'
+      object mnuFileExit: TMenuItem
+        Action = actFileExit
+      end
+    end
+    object mnuCookies: TMenuItem
+      Caption = '&Cookies'
+    end
+  end
+  object alMain: TActionList
+    OnUpdate = alMainUpdate
+    Left = 524
+    Top = 216
+    object actFileExit: TFileExit
+      Category = 'File'
+      Caption = 'E&xit'
+      Hint = 'Exit'
+    end
+    object actCookiesFind: TAction
+      Category = 'Cookies'
+      Caption = 'F&ind'
+      OnExecute = actCookiesFindExecute
+    end
+    object actCookiesRead: TAction
+      Category = 'Cookies'
+      Caption = '&Read'
+      OnExecute = actCookiesReadExecute
+    end
+  end
+  object SQLite3Connection: TSQLite3Connection
+    Connected = False
+    LoginPrompt = False
+    KeepConnection = False
+    Transaction = SQLTransaction
+    AlwaysUseBigint = False
+    Left = 425
+    Top = 280
+  end
+  object SQLTransaction: TSQLTransaction
+    Active = False
+    Database = SQLite3Connection
+    Left = 425
+    Top = 352
+  end
+  object SQLQueryCookies: TSQLQuery
+    FieldDefs = <>
+    Left = 425
+    Top = 408
+  end
+  object dsCookies: TDataSource
+    DataSet = SQLQueryCookies
+    Left = 425
+    Top = 472
+  end
+end
