@@ -24,6 +24,8 @@ type
     actFileExit: TFileExit;
     gbPath: TGroupBox;
     gbCookies: TGroupBox;
+    mnuCookiesRead: TMenuItem;
+    mnuCookiesFind: TMenuItem;
     mnuCookies: TMenuItem;
     mnuFileExit: TMenuItem;
     mnuFile: TMenuItem;
@@ -33,11 +35,13 @@ type
     SQLQueryCookies: TSQLQuery;
     SQLTransaction: TSQLTransaction;
     procedure FormCreate(Sender: TObject);
-    procedure FormDestroy(Sender: TObject);
+    procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure alMainUpdate(AAction: TBasicAction; var Handled: Boolean);
     procedure actCookiesFindExecute(Sender: TObject);
     procedure actCookiesReadExecute(Sender: TObject);
   private
+    FTmpProfiles: String;
+
     procedure InitShortCuts;
   public
 
@@ -53,6 +57,7 @@ implementation
 uses
   LCLType
 , IniFiles
+, FileUtil
 ;
 
 { TfrmMain }
@@ -62,10 +67,11 @@ begin
   InitShortCuts;
 end;
 
-procedure TfrmMain.FormDestroy(Sender: TObject);
+procedure TfrmMain.FormClose(Sender: TObject; var CloseAction: TCloseAction);
 begin
-  { #todo -ogcarreno : Disconnect Database }
-  { #todo -ogcarreno : Delete database temp file }
+  SQLite3Connection.Close;
+  if FileExists(FTmpProfiles) then
+    DeleteFile(FTmpProfiles);
 end;
 
 procedure TfrmMain.InitShortCuts;
@@ -177,7 +183,23 @@ end;
 
 procedure TfrmMain.actCookiesReadExecute(Sender: TObject);
 begin
+  if Length(edtPath.Text) > 0 then
+  begin
+    if FileExists(edtPath.Text) then
+    begin
+      FTmpProfiles:= GetTempFileName;
+      CopyFile(edtPath.Text, FTmpProfiles);
 
+      SQLite3Connection.DatabaseName:= FTmpProfiles;
+      SQLite3Connection.Open;
+
+      SQLQueryCookies.SQL.Add(
+        'SELECT host, name, value, path, expiry, isSecure, isHttpOnly ' +
+        'FROM moz_cookies;'
+      );
+      SQLQueryCookies.Active:= True;
+    end;
+  end;
 end;
 
 end.

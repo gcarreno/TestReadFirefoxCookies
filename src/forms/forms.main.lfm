@@ -10,9 +10,8 @@ object frmMain: TfrmMain
   Constraints.MinWidth = 700
   Menu = mmMain
   Position = poScreenCenter
-  LCLVersion = '4.99.0.0'
+  OnClose = FormClose
   OnCreate = FormCreate
-  OnDestroy = FormDestroy
   object gbPath: TGroupBox
     Left = 4
     Height = 54
@@ -113,6 +112,12 @@ object frmMain: TfrmMain
     end
     object mnuCookies: TMenuItem
       Caption = '&Cookies'
+      object mnuCookiesFind: TMenuItem
+        Action = actCookiesFind
+      end
+      object mnuCookiesRead: TMenuItem
+        Action = actCookiesRead
+      end
     end
   end
   object alMain: TActionList
@@ -152,12 +157,14 @@ object frmMain: TfrmMain
   end
   object SQLQueryCookies: TSQLQuery
     FieldDefs = <>
+    Database = SQLite3Connection
+    Transaction = SQLTransaction
     Left = 425
     Top = 408
   end
   object dsCookies: TDataSource
     DataSet = SQLQueryCookies
-    Left = 425
+    Left = 424
     Top = 472
   end
 end
