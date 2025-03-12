@@ -200,6 +200,14 @@ begin
     TmpProfilePath := FPathList.Data[comboboxPath.ItemIndex];
   if (TmpProfilePath = '') or not FileExists(TmpProfilePath) then
     exit;
+
+  if SQLite3Connection.Connected then
+  begin
+    SQLQueryCookies.Close;
+    SQLite3Connection.Close(True);
+    DeleteFile(FTmpProfiles);
+  end;
+
   FTmpProfiles:= GetTempFileName;
   CopyFile(TmpProfilePath, FTmpProfiles);
 
