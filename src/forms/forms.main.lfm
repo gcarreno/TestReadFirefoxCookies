@@ -10,49 +10,48 @@ object frmMain: TfrmMain
   Constraints.MinWidth = 700
   Menu = mmMain
   Position = poScreenCenter
+  LCLVersion = '4.99.0.0'
   OnClose = FormClose
   OnCreate = FormCreate
+  OnDestroy = FormDestroy
   object gbPath: TGroupBox
     Left = 4
-    Height = 54
-    Top = 38
+    Height = 43
+    Top = 29
     Width = 696
     Align = alTop
     AutoSize = True
     BorderSpacing.Left = 4
     BorderSpacing.Bottom = 4
     Caption = 'Path to cookies'
-    ClientHeight = 35
-    ClientWidth = 694
+    ClientHeight = 23
+    ClientWidth = 692
     TabOrder = 1
-    object edtPath: TEdit
-      Left = 4
-      Height = 35
+    object comboboxPath: TComboBox
+      Left = 0
+      Height = 23
       Top = 0
-      Width = 650
-      Align = alTop
-      BorderSpacing.Left = 4
-      Constraints.MaxWidth = 650
-      ReadOnly = True
+      Width = 658
+      ItemHeight = 15
       TabOrder = 0
     end
   end
   object gbCookies: TGroupBox
     Left = 4
-    Height = 454
-    Top = 96
+    Height = 474
+    Top = 76
     Width = 696
     Align = alClient
     BorderSpacing.Left = 4
     Caption = 'Cookies data'
-    ClientHeight = 435
-    ClientWidth = 694
+    ClientHeight = 454
+    ClientWidth = 692
     TabOrder = 2
     object DBGridCookies: TDBGrid
       Left = 4
-      Height = 435
+      Height = 454
       Top = 0
-      Width = 686
+      Width = 684
       Align = alClient
       BorderSpacing.Left = 4
       BorderSpacing.Right = 4
@@ -65,7 +64,7 @@ object frmMain: TfrmMain
   end
   object panButtons: TPanel
     Left = 4
-    Height = 34
+    Height = 25
     Top = 0
     Width = 696
     Align = alTop
@@ -73,12 +72,12 @@ object frmMain: TfrmMain
     BorderSpacing.Left = 4
     BorderSpacing.Bottom = 4
     BevelOuter = bvNone
-    ClientHeight = 34
+    ClientHeight = 25
     ClientWidth = 696
     TabOrder = 0
     object btnCookiesFind: TButton
       Left = 4
-      Height = 34
+      Height = 25
       Top = 0
       Width = 60
       Action = actCookiesFind
@@ -90,7 +89,7 @@ object frmMain: TfrmMain
     end
     object btnCookiesRead: TButton
       Left = 68
-      Height = 34
+      Height = 25
       Top = 0
       Width = 60
       Action = actCookiesRead

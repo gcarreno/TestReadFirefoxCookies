@@ -6,9 +6,11 @@ interface
 
 uses
   Classes, SysUtils, SQLite3Conn, SQLDB, DB, Forms, Controls, Graphics, Dialogs,
-  Menus, ActnList, StdCtrls, ExtCtrls, DBGrids, StdActns;
+  Menus, ActnList, StdCtrls, ExtCtrls, DBGrids, StdActns, fgl;
 
 type
+
+  TPathList = specialize TFPGMap<String, String>;
 
   { TfrmMain }
 
@@ -18,9 +20,9 @@ type
     alMain: TActionList;
     btnCookiesFind: TButton;
     btnCookiesRead: TButton;
+    comboboxPath: TComboBox;
     dsCookies: TDataSource;
     DBGridCookies: TDBGrid;
-    edtPath: TEdit;
     actFileExit: TFileExit;
     gbPath: TGroupBox;
     gbCookies: TGroupBox;
@@ -39,8 +41,10 @@ type
     procedure alMainUpdate(AAction: TBasicAction; var Handled: Boolean);
     procedure actCookiesFindExecute(Sender: TObject);
     procedure actCookiesReadExecute(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
   private
     FTmpProfiles: String;
+    FPathList: TPathList;
     procedure MemoGetText(Sender: TField; var aText: string; DisplayText: Boolean);
     procedure OpenDataSet(aDataSet: TSQLQuery);
     procedure InitShortCuts;
@@ -64,7 +68,8 @@ uses
 { TfrmMain }
 
 procedure TfrmMain.FormCreate(Sender: TObject);
-begin
+begin                           
+  FPathList := TPathList.Create;
   InitShortCuts;
 end;
 
@@ -87,7 +92,7 @@ end;
 
 procedure TfrmMain.alMainUpdate(AAction: TBasicAction; var Handled: Boolean);
 begin
-  if Length(edtPath.Text) = 0 then
+  if FPathList.Count = 0 then
   begin
     actCookiesFind.Enabled:= True;
     actCookiesRead.Enabled:= False;
@@ -105,8 +110,9 @@ var
   profilesFileTest, profilesFile, section: String;
   profilesINI: TIniFile;
   sections: TStringList;
-  //index: Integer;
+  i: Integer;
 begin
+  FPathList.Clear;
   profilesFile:= EmptyStr;
   profilesFileTest:= EmptyStr;
 {$IFDEF WINDOWS}
@@ -167,10 +173,7 @@ begin
               'cookies.sqlite'
             ]);
             if FileExists(profilesFileTest) then
-            begin
-              edtPath.Text:= profilesFileTest;
-              break;
-            end;
+              FPathList.Add(profilesINI.ReadString(section, 'name', ''), profilesFileTest);
           end;
         end;
       finally
@@ -180,27 +183,39 @@ begin
       profilesINI.Free;
     end;
   end;
+  comboboxPath.Items.Clear;
+  for i := 0 to FPathList.Count - 1 do
+    comboboxPath.Items.Add(FPathList.Keys[i] + ' [' + FPathList.Data[i] + ']');
+  if FPathList.Count > 0 then
+    comboboxPath.ItemIndex := 0;
 end;
 
 procedure TfrmMain.actCookiesReadExecute(Sender: TObject);
+var
+  TmpProfilePath: String;
 begin
-  if Length(edtPath.Text) > 0 then
-  begin
-    if FileExists(edtPath.Text) then
-    begin
-      FTmpProfiles:= GetTempFileName;
-      CopyFile(edtPath.Text, FTmpProfiles);
+  if comboboxPath.ItemIndex < 0 then
+    TmpProfilePath := comboboxPath.Text
+  else
+    TmpProfilePath := FPathList.Data[comboboxPath.ItemIndex];
+  if (TmpProfilePath = '') or not FileExists(TmpProfilePath) then
+    exit;
+  FTmpProfiles:= GetTempFileName;
+  CopyFile(TmpProfilePath, FTmpProfiles);
 
-      SQLite3Connection.DatabaseName:= FTmpProfiles;
-      SQLite3Connection.Open;
+  SQLite3Connection.DatabaseName:= FTmpProfiles;
+  SQLite3Connection.Open;
 
-      SQLQueryCookies.SQL.Add(
-        'SELECT host, name, value, path, datetime(expiry, ''unixepoch'', ''localtime'') expiry, isSecure, isHttpOnly ' +
-        'FROM moz_cookies;'
-      );
-      OpenDataSet(SQLQueryCookies);
-    end;
-  end;
+  SQLQueryCookies.SQL.Add(
+    'SELECT host, name, value, path, datetime(expiry, ''unixepoch'', ''localtime'') expiry, isSecure, isHttpOnly ' +
+    'FROM moz_cookies;'
+  );
+  OpenDataSet(SQLQueryCookies);
+end;
+
+procedure TfrmMain.FormDestroy(Sender: TObject);
+begin
+  FPathList.Free;
 end;
 
 procedure TfrmMain.MemoGetText(Sender: TField; var aText: string; DisplayText: Boolean);
