@@ -41,7 +41,8 @@ type
     procedure actCookiesReadExecute(Sender: TObject);
   private
     FTmpProfiles: String;
-
+    procedure MemoGetText(Sender: TField; var aText: string; DisplayText: Boolean);
+    procedure OpenDataSet(aDataSet: TSQLQuery);
     procedure InitShortCuts;
   public
 
@@ -194,10 +195,28 @@ begin
       SQLite3Connection.Open;
 
       SQLQueryCookies.SQL.Add(
-        'SELECT host, name, value, path, expiry, isSecure, isHttpOnly ' +
+        'SELECT host, name, value, path, datetime(expiry, ''unixepoch'', ''localtime'') expiry, isSecure, isHttpOnly ' +
         'FROM moz_cookies;'
       );
-      SQLQueryCookies.Active:= True;
+      OpenDataSet(SQLQueryCookies);
+    end;
+  end;
+end;
+
+procedure TfrmMain.MemoGetText(Sender: TField; var aText: string; DisplayText: Boolean);
+begin
+  aText := Sender.AsString;
+end;
+
+procedure TfrmMain.OpenDataSet(aDataSet: TSQLQuery);
+var
+  i: Integer;
+begin
+  aDataSet.Open;
+  for i := 0 to aDataSet.FieldCount - 1 do
+  begin
+    case aDataSet.Fields[i].DataType of
+      ftMemo, ftString: aDataSet.Fields[i].OnGetText := @MemoGetText;
     end;
   end;
 end;
